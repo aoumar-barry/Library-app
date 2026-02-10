@@ -34,12 +34,28 @@ LibraryApp est une application moderne permettant de gérer une bibliothèque pe
    cd Ruby-project
    ```
 
-2. **Construire et démarrer les conteneurs**
+2. **Configurer les variables d'environnement**
+   
+   Créez un fichier `.env` à la racine du projet en copiant le fichier d'exemple :
+   ```bash
+   cp .env.example .env
+   ```
+   
+   > **Note** : Le fichier `.env.example` contient déjà des valeurs par défaut fonctionnelles pour le développement local. Vous pouvez utiliser ces valeurs telles quelles pour démarrer rapidement.
+   
+   Si vous souhaitez générer une nouvelle clé secrète (optionnel) :
+   ```bash
+   # Générer une nouvelle SECRET_KEY_BASE
+   docker-compose run --rm web bundle exec rails secret
+   # Copiez la clé générée et remplacez la valeur dans le fichier .env
+   ```
+
+3. **Construire et démarrer les conteneurs**
    ```bash
    docker-compose up --build
    ```
 
-3. **Créer et initialiser la base de données** (dans un nouveau terminal)
+4. **Créer et initialiser la base de données** (dans un nouveau terminal)
    ```bash
    docker-compose exec web bundle exec rails db:create db:migrate
    ```
@@ -86,3 +102,40 @@ docker-compose exec web bundle exec rails db:migrate
 ```bash
 docker-compose exec web bundle exec rails db:reset
 ```
+
+## Dépannage
+
+### Erreur lors du build : "SECRET_KEY_BASE" manquant
+
+Si vous rencontrez cette erreur lors de l'exécution de `docker-compose up --build` :
+
+```
+failed to solve: process "/bin/sh -c SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile" did not complete successfully: exit code: 127
+```
+
+**Solution** : Assurez-vous d'avoir créé le fichier `.env` à partir du fichier `.env.example` :
+
+```bash
+cp .env.example .env
+```
+
+Le fichier `.env.example` contient déjà des valeurs par défaut qui fonctionnent pour le développement local.
+
+### Les conteneurs ne démarrent pas
+
+Si les conteneurs ne démarrent pas correctement :
+
+1. Arrêtez tous les conteneurs :
+   ```bash
+   docker-compose down
+   ```
+
+2. Supprimez les volumes (attention : cela supprimera toutes les données) :
+   ```bash
+   docker-compose down -v
+   ```
+
+3. Reconstruisez et redémarrez :
+   ```bash
+   docker-compose up --build
+   ```
